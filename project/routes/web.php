@@ -18,3 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/export-csv/monthly-report', 'MonthlyReportController@index');
+
+Route::get('/export-csv/monthly-report/transfer-slip', 'MonthlyReportController@exportCsv');
