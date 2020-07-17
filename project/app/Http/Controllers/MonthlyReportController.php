@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use BranchStockService;
+use OfficeStockService;
+use OfficePurchasesService;
 use Log;
 
 class MonthlyReportController extends Controller
@@ -32,8 +33,10 @@ class MonthlyReportController extends Controller
 
     public function exportCsv(Request $request)
     {
+        Log::debug("[START] MonthlyReportController::exportCsv()");
 
         $type = $request->input('type');
+        Log::debug("[INPUT] type = ". $type);
 
         if ($type == "stock")
         {
@@ -45,9 +48,9 @@ class MonthlyReportController extends Controller
         }
         elseif ($type == "purchases")
         {
-            return $this->exportStockCsv($request);
+            return $this->exportPurchasesCsv($request);
         }
-        else
+        elseif ($type == "expenses")
         {
             return $this->exportStockCsv($request);            
         }
@@ -82,6 +85,14 @@ class MonthlyReportController extends Controller
         $startDate = explode("-",$startDateYYYYMM);
         $startMonth = $startDate[1];
 
+
+        Log::debug("strBeforeDateYYYYMMDD = " . $strBeforeDateYYYYMMDD);
+        Log::debug("strStartDateYYYYMMDD = " . $strStartDateYYYYMMDD);
+        Log::debug("strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
+        Log::debug("startMonth = " . $startMonth);
+        Log::debug("endMonth = " . $endMonth);
+
+
         $officeCode = $request->input('office');
         Log::debug("office = " . $officeCode);
 
@@ -91,11 +102,11 @@ class MonthlyReportController extends Controller
         $previousStockValue = 0;
         $currentStockValue  = 0;
 
-        [$previousStockValue,$currentStockValue] = BranchStockService::getStockValue($strBeforeDateYYYYMMDD, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode);
+        [$previousStockValue,$currentStockValue] = OfficeStockService::getStockValue($strBeforeDateYYYYMMDD, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode);
 
 
         Log::debug("[END] MonthlyReportController::exportStockCsv()");
-		return BranchStockService::exportCsv($previousStockValue, $currentStockValue, $startMonth, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD);
+		return OfficeStockService::exportCsv($previousStockValue, $currentStockValue, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD);
         
     }
 
@@ -103,7 +114,7 @@ class MonthlyReportController extends Controller
 
 
 
-    public function exportSalesCsv(Request $request)
+    private function exportSalesCsv(Request $request)
     {
 
         return 1; 
@@ -114,16 +125,50 @@ class MonthlyReportController extends Controller
 
 
 
-    public function exportPurchasesCsv(Request $request)
+    private function exportPurchasesCsv(Request $request)
     {
-        return 1; 
+        Log::debug("[START] MonthlyReportController::exportPurchasesCsv()");
+
+        $endDateYYYYMM = $request->input('month');//format "yyyy-mm"
+
+        Log::debug("month = " . $endDateYYYYMM);
+
+        $endDay = "20";
+        $endDateYYYYMMDD = $endDateYYYYMM ."-".$endDay;//format "yyyy-mm-dd"
+        $strEndDateYYYYMMDD = date('Ymd',strtotime($endDateYYYYMMDD)); //format "yyyymmdd"
+
+        $startDateYYYYMM = date('Y-m',strtotime('-1 month',strtotime($endDateYYYYMMDD)));//format "yyyy-mm"
+        $startDay = "21";
+        $startDateYYYYMMDD = $startDateYYYYMM ."-".$startDay;//format "yyyy-mm-dd"
+        $strStartDateYYYYMMDD = date('Ymd',strtotime($startDateYYYYMMDD)); //format "yyyymmdd"
+
+        $endDate = explode("-",$endDateYYYYMM);
+        $endMonth = $endDate[1];
+
+        $startDate = explode("-",$startDateYYYYMM);
+        $startMonth = $startDate[1];
+
+        $strKbn = "2";
+        $departmentCode = "05";
+
+        Log::debug("strStartDateYYYYMMDD = " . $strStartDateYYYYMMDD);
+        Log::debug("strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
+        Log::debug("startMonth = " . $startMonth);
+        Log::debug("endMonth = " . $endMonth);
+
+        $arrayPurchasesValue = array();
+        $arrayPurchasesValue = OfficePurchasesService::getPurchasesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $strKbn, $departmentCode);
+
+        Log::debug("[END] MonthlyReportController::exportPurchasesCsv()");
+        return OfficePurchasesService::exportCsv($arrayPurchasesValue, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD);
+        
     }
 
 
 
 
 
-    public function exportExpensesCsv(Request $request)
+    private function exportExpensesCsv(Request $request)
     {
         return 1; 
     }

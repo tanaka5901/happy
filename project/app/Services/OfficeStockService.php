@@ -3,14 +3,19 @@
 namespace App\Services;
 use DB;
 use Log;
-use App\test;
 
-class BranchStockService
+class OfficeStockService
 {
     public function exportCsv($previousStockValue, $currentStockValue, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD)
     {
 
-    	Log::debug("[START] BranchStockService::exportCsv()");
+    	Log::debug("[START] OfficeStockService::exportCsv()");
+    	Log::debug("[INPUT] previousStockValue = " . $previousStockValue);
+    	Log::debug("[INPUT] currentStockValue = " . $currentStockValue);
+    	Log::debug("[INPUT] startMonth = " . $startMonth);
+    	Log::debug("[INPUT] endMonth = " . $endMonth);
+    	Log::debug("[INPUT] strStartDateYYYYMMDD = " . $strStartDateYYYYMMDD);
+    	Log::debug("[INPUT] strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
 
 		// CSVファイル名
     	$currentDate = date("Ymd");
@@ -25,14 +30,6 @@ class BranchStockService
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
         ];
-
-    	Log::debug("previousStockValue = " . $previousStockValue);
-    	Log::debug("currentStockValue = " . $currentStockValue);
-    	Log::debug("startMonth = " . $startMonth);
-    	Log::debug("endMonth = " . $endMonth);
-    	Log::debug("strStartDateYYYYMMDD = " . $strStartDateYYYYMMDD);
-    	Log::debug("strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
-
 
         $callback = function () use ($previousStockValue, $currentStockValue, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD) 
         {
@@ -189,7 +186,7 @@ class BranchStockService
             fclose($createCsvFile); //ファイル閉じる
         };
         
-    	Log::debug("[START] BranchStockService::exportCsv()");
+    	Log::debug("[END] OfficeStockService::exportCsv()");
         return response()->stream($callback, 200, $headers); //ここで実行
 
     }
@@ -200,11 +197,11 @@ class BranchStockService
 
     public function getStockValue($strBeforeDateYYYYMMDD, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode)
     {
-    	Log::debug("[START] BranchStockService::getStockValue()");
+    	Log::debug("[START] OfficeStockService::getStockValue()");
 
     	[$previousStockValue,$currentStockValue] = $this->calculateStockValue($strBeforeDateYYYYMMDD, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode);
 
-    	Log::debug("[END] BranchStockService::getStockValue()");
+    	Log::debug("[END] OfficeStockService::getStockValue()");
         return [$previousStockValue,$currentStockValue];
     }
 
@@ -213,7 +210,7 @@ class BranchStockService
 
     private function calculateStockValue($strBeforeDateYYYYMMDD, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $strJigyo_Cd, $strBu_Cd)
     {
-    	Log::debug("[START] BranchStockService::calculateStockValue()");
+    	Log::debug("[START] OfficeStockService::calculateStockValue()");
 
     	if ($strBu_Cd <> "00") {
 		//'-------------------------------------------------------------------
@@ -427,15 +424,16 @@ class BranchStockService
 
 		[$lZenZanKingaku_Sum ,$lTouZanKingaku_Sum] = $this->calculateStockValueByProducts($strBeforeDateYYYYMMDD, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $strJigyo_Cd, $strBu_Cd, $results);
 
-
-    	Log::debug("lZenZanKingaku_Sum =" . $lZenZanKingaku_Sum);
-    	Log::debug("lTouZanKingaku_Sum =" . $lTouZanKingaku_Sum);
-		
 		//'	前月/日在庫金額加算: $lZenZanKingaku_Sum
 		$previousStockValue = $lZenZanKingaku_Sum;
 		//'	当月/日在庫金額加算: lTouZanKingaku_Sum
 		$currentStockValue = $lTouZanKingaku_Sum;
 
+    	Log::debug("previousStockValue =" . $previousStockValue);
+    	Log::debug("currentStockValue =" . $currentStockValue);
+		
+
+    	Log::debug("[END] OfficeStockService::calculateStockValue()");
         return [$previousStockValue ,$currentStockValue];
     }
 
@@ -463,7 +461,7 @@ class BranchStockService
 			$resultSyohinCd = $result->SYOHIN_CD;
 			$resultBuCd = $result->BU_CD;
 	
-	    	Log::debug("counter =" . ++$count);			
+	    	Log::debug("counte = " . ++$count);			
 			Log::debug("[INPUT] resultSyohinKbn =" . $resultSyohinKbn);
 			Log::debug("[INPUT] resultSyohinCd =" . $resultSyohinCd);
 			Log::debug("[INPUT] resultBuCd =" . $resultBuCd);
