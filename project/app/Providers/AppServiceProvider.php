@@ -3,7 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Services\BranchStockService;
+use App\Services\OfficeStockService;
+use App\Services\OfficePurchasesService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('BranchStockService', BranchStockService::class);
+        $this->app->bind('OfficeStockService', OfficeStockService::class);
+        $this->app->bind('OfficePurchasesService', OfficePurchasesService::class);
     }
 
     /**
