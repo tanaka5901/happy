@@ -9,7 +9,7 @@ use OfficePurchasesService,OfficeStockService;
 class OfficeExpensesService
 {
 
-    public function exportCsv($officeCode, $lZeinukiToSum, $dGenkaSum, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD)
+    public function exportCsv($officeCode, $purchasesValue, $expenses, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD)
     {
 
     	Log::debug("[START] OfficeExpensesService::exportCsv()");
@@ -34,7 +34,7 @@ class OfficeExpensesService
 
 
 
-        $callback = function () use ($officeCode, $lZeinukiToSum, $dGenkaSum, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD) 
+        $callback = function () use ($officeCode, $purchasesValue, $expenses, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD) 
         {
             
             $createCsvFile = fopen('php://output', 'w'); //ファイル作成
@@ -131,7 +131,7 @@ class OfficeExpensesService
                 "",
                 "",
                 "",
-                intval($lZeinukiToSum - $dGenkaSum),
+                intval($purchasesValue - $dGenkaSum),
                 "",
                 "",
                 "",
@@ -144,7 +144,7 @@ class OfficeExpensesService
                 "",
                 "",
                 "",
-                intval($lZeinukiToSum),
+                intval($purchasesValue),
                 "",
                 "",
                 "",
@@ -177,7 +177,7 @@ class OfficeExpensesService
                 "",
                 "",
                 "",
-                intval($dGenkaSum),
+                intval($expenses),
                 "",
                 "",
                 "",
@@ -223,9 +223,9 @@ class OfficeExpensesService
     {
 		Log::debug("[START] OfficeExpensesService::getExpensesValue()");
 
-	   	$lZeinukiToSum = 0;
+	   	$purchasesValue = 0;
 
-	   	$lZeinukiToSum = OfficePurchasesService::getOfficePurchasesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode);
+	   	$purchasesValue = OfficePurchasesService::getOfficePurchasesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode);
 
         if ($officeCode == "0011") //狭山:エステサンプル
         {
@@ -250,12 +250,12 @@ class OfficeExpensesService
 	    
 	    $strZappinCode = "01";
 
-	    $dGenkaSum = $this->calculateSalesPersonExpensesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $strSalesPersonCode, $strZappinCode);
+	    $expenses = $this->calculateSalesPersonExpensesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $strSalesPersonCode, $strZappinCode);
 
-		Log::debug("lZeinukiToSum = " . $lZeinukiToSum);
-		Log::debug("dGenkaSum = " . $dGenkaSum);
+		Log::debug("purchasesValue = " . $purchasesValue);
+		Log::debug("expenses = " . $expenses);
 		Log::debug("[END] OfficeExpensesService::getExpensesValue()");
-	    return [$lZeinukiToSum, $dGenkaSum];
+	    return [$purchasesValue, $expenses];
     }
 
 
