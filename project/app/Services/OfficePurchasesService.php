@@ -18,7 +18,7 @@ class OfficePurchasesService
 
 		// CSVファイル名
     	$currentDate = date("Ymd");
-        $file_name = $currentDate."-"."stock"
+        $file_name = $currentDate."-"."purchases"
         			."-".$strStartDateYYYYMMDD."-".$strEndDateYYYYMMDD.".csv";
 
 
@@ -173,6 +173,44 @@ class OfficePurchasesService
     }
 
 
+    public function getOfficePurchasesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode)
+    {
+    	Log::debug("[START] OfficePurchasesService::getOfficePurchasesValue()");
+
+    	$purchasesValue = $this->calculateOfficePurchasesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode);
+
+    	Log::debug("[END] OfficePurchasesService::getOfficePurchasesValue()");
+        return $purchasesValue;
+    }
+
+
+    private function calculateOfficePurchasesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $strBu_Cd)
+    {
+    	Log::debug("[START] OfficePurchasesService::calculateOfficePurchasesValue()");
+
+        $strSQL = "SELECT MISE_KBN, HOUJIN_KBN, JIGYO_CD, JIGYO_RMEI AS JIGYO_MEI, SIMEBI_MATU, SYOHIZEI_KBN "
+        		."FROM TM_BS102 "
+        		."WHERE JIGYO_CD ='" . $officeCode . "' "
+        		."AND LEFT(JIGYO_CD, 2) <> '03' "
+        		."AND (HEISABI IS NULL OR HEISABI = '') "
+        		."ORDER BY JIGYO_CD ASC ";
+
+        $results = DB::select($strSQL);
+
+        $arrayPurchasesValue = $this->calculatePurchasesValueByBranch($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $strBu_Cd, $results);
+
+        $purchasesValue = 0;
+        foreach ($arrayPurchasesValue as $key => $value) 
+        {
+        	$purchasesValue = $value;
+        	Log::debug("purchasesValue = " . $purchasesValue);
+        }
+
+    	Log::debug("[END] OfficePurchasesService::calculateOfficePurchasesValue()");
+    	return $purchasesValue;
+    }
+
+
 
     public function getPurchasesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $strKbn, $departmentCode)
     {
@@ -183,7 +221,6 @@ class OfficePurchasesService
     	Log::debug("[END] OfficePurchasesService::getPurchasesValue()");
         return $arrayPurchasesValue;
     }
-
 
 
 

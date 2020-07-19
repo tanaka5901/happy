@@ -227,6 +227,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'OfficeStockService' => App\Facades\OfficeStockService::class,
         'OfficePurchasesService' => App\Facades\OfficePurchasesService::class,
+        'OfficeExpensesService' => App\Facades\OfficeExpensesService::class,
 
     ],
 

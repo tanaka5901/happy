@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use OfficeStockService;
 use OfficePurchasesService;
+use OfficeExpensesService;
 use Log;
 
 class MonthlyReportController extends Controller
@@ -52,10 +53,11 @@ class MonthlyReportController extends Controller
         }
         elseif ($type == "expenses")
         {
-            return $this->exportStockCsv($request);            
+            return $this->exportExpensesCsv($request);            
         }
         
     }
+
 
 
     private function exportStockCsv(Request $request)
@@ -170,11 +172,46 @@ class MonthlyReportController extends Controller
 
     private function exportExpensesCsv(Request $request)
     {
-        return 1; 
+        Log::debug("[START] MonthlyReportController::exportExpensesCsv()");
+
+        $endDateYYYYMM = $request->input('month');//format "yyyy-mm"
+
+        Log::debug("month = " . $endDateYYYYMM);
+
+        $endDay = "20";
+        $endDateYYYYMMDD = $endDateYYYYMM ."-".$endDay;//format "yyyy-mm-dd"
+        $strEndDateYYYYMMDD = date('Ymd',strtotime($endDateYYYYMMDD)); //format "yyyymmdd"
+
+        $startDateYYYYMM = date('Y-m',strtotime('-1 month',strtotime($endDateYYYYMMDD)));//format "yyyy-mm"
+        $startDay = "21";
+        $startDateYYYYMMDD = $startDateYYYYMM ."-".$startDay;//format "yyyy-mm-dd"
+        $strStartDateYYYYMMDD = date('Ymd',strtotime($startDateYYYYMMDD)); //format "yyyymmdd"
+
+        $endDate = explode("-",$endDateYYYYMM);
+        $endMonth = $endDate[1];
+
+        $startDate = explode("-",$startDateYYYYMM);
+        $startMonth = $startDate[1];
+
+        Log::debug("strStartDateYYYYMMDD = " . $strStartDateYYYYMMDD);
+        Log::debug("strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
+        Log::debug("startMonth = " . $startMonth);
+        Log::debug("endMonth = " . $endMonth);
+
+        $officeCode = $request->input('officeExpenses');
+        Log::debug("officeExpenses = " . $officeCode);
+
+        $departmentCode = $request->input('departmentExpenses');
+        Log::debug("departmentExpenses = " . $departmentCode);
+
+        $purchasesValue = 0;
+        $expenses  = 0;
+
+        [$purchasesValue, $expenses] = OfficeExpensesService::getExpensesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode);
+
+
+        Log::debug("[END] MonthlyReportController::exportExpensesCsv()");
+        return OfficeExpensesService::exportCsv($officeCode, $purchasesValue, $expenses, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD);
     }
-
-
-
-
 
 }

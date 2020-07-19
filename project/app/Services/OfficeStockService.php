@@ -1011,7 +1011,7 @@ class OfficeStockService
 
 
 
-	private function getGenka($strJigyo_Cd, $resultSyohinKbn, $resultSyohinCd)
+	public function getGenka($strJigyo_Cd, $resultSyohinKbn, $resultSyohinCd)
 	{
     	Log::debug("[START] BranchStockService::getGenka()");
 

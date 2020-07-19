@@ -22,21 +22,31 @@
                                 // 事業所別在庫が選択されたら下記を実行
                                 document.getElementById('office').style.display = "";
                                 document.getElementById('department').style.display = "";
+                                document.getElementById('officeExpenses').style.display = "none";
+                                document.getElementById('departmentExpenses').style.display = "none";
                             } else if (type[1].checked) {
                                 // 売掛残高一覧表＆売上一覧表が選択されたら下記を実行
                                 document.getElementById('office').style.display = "";
                                 document.getElementById('department').style.display = "";
+                                document.getElementById('officeExpenses').style.display = "none";
+                                document.getElementById('departmentExpenses').style.display = "none";
                             } else if (type[2].checked) {
                                 // 商品管理部売掛残高一覧表が選択されたら下記を実行
                                 document.getElementById('office').style.display = "none";
                                 document.getElementById('department').style.display = "none";
+                                document.getElementById('officeExpenses').style.display = "none";
+                                document.getElementById('departmentExpenses').style.display = "none";
                             } else if (type[3].checked) {
                                 // 販売担当者別売上実績表＆買掛台帳が選択されたら下記を実行
-                                document.getElementById('office').style.display = "";
-                                document.getElementById('department').style.display = "";
+                                document.getElementById('office').style.display = "none";
+                                document.getElementById('department').style.display = "none";
+                                document.getElementById('officeExpenses').style.display = "";
+                                document.getElementById('departmentExpenses').style.display = "";
                             } else {
-                                document.getElementById('office').style.display = "";
-                                document.getElementById('department').style.display = "";
+                                document.getElementById('office').style.display = "none";
+                                document.getElementById('department').style.display = "none";
+                                document.getElementById('officeExpenses').style.display = "none";
+                                document.getElementById('departmentExpenses').style.display = "none";
                             }
                         }
                         window.addEventListener('load', formSwitch());
@@ -93,6 +103,28 @@
                                         </select>
                                     </td>
                                 </tr>
+
+                                <tr id="officeExpenses" style="display: none;">
+                                    <td>事業所名</td>
+                                    <td>
+                                        <select name="officeExpenses">
+                                            <option value="0011">狭山</option>
+                                            <option value="0017">高松</option>
+                                            <option value="0023">佐世保</option>
+                                            <option value="0027">熊本</option>
+                                            <option value="0050">福岡</option>
+                                        </select>                                        
+                                    </td>
+                                </tr>
+                                <tr id="departmentExpenses" style="display: none;">
+                                    <td>部署名</td>
+                                    <td>
+                                        <select name="departmentExpenses">
+                                            <option value="05">エステ</option>
+                                            <option value="04">訪販</option>
+                                        </select>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
 
@@ -112,6 +144,19 @@
                                 return;
                             }
 
+                            var officeExpenses = FD.get("officeExpenses");
+                            var departmentExpenses = FD.get("departmentExpenses");
+                            if (officeExpenses == "0050"){
+                                if(departmentExpenses != "04"){
+                                    alert("部署名：訪販を入力してください");
+                                    return;                                    
+                                }
+                            } else {
+                                if(departmentExpenses != "05"){
+                                    alert("部署名：エステを入力してください");
+                                    return;                                    
+                                }
+                            }
 
                             var url = '/export-csv/monthly-report/transfer-slip?';
 
