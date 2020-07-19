@@ -131,7 +131,7 @@ class OfficeExpensesService
                 "",
                 "",
                 "",
-                intval($purchasesValue - $dGenkaSum),
+                intval($purchasesValue - $expenses),
                 "",
                 "",
                 "",
