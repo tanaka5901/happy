@@ -228,6 +228,7 @@ return [
         'OfficeStockService' => App\Facades\OfficeStockService::class,
         'OfficePurchasesService' => App\Facades\OfficePurchasesService::class,
         'OfficeExpensesService' => App\Facades\OfficeExpensesService::class,
+        'OfficeSalesService' => App\Facades\OfficeSalesService::class,
 
     ],
 

@@ -39,7 +39,7 @@ class OfficeExpensesService
             
             $createCsvFile = fopen('php://output', 'w'); //ファイル作成
             
-             $columns = [ //1行目の情報
+            $columns = [ //1行目の情報
                 "月種別",
                 "種類",
                 "形式",
@@ -47,41 +47,41 @@ class OfficeExpensesService
                 "付箋",
                 "伝票日付",
                 "伝票番号",
-                "伝票摘要",
+                "伝票摘要",//""
                 "枝番",
                 "借方部門",
-                "借方部門名",
+                "借方部門名",//""
                 "借方科目",
-                "借方科目名",
+                "借方科目名",//""
                 "借方補助",
-                "借方補助科目名",
+                "借方補助科目名",//""
                 "借方金額",
                 "借方消費税コード",
                 "借方消費税業種",
                 "借方消費税税率",
                 "借方資金区分",
-                "借方任意項目１",
-                "借方任意項目２",
+                "借方任意項目１",//""
+                "借方任意項目２",//""
                 "貸方部門",
-                "貸方部門名",
+                "貸方部門名",//""
                 "貸方科目",
-                "貸方科目名",
+                "貸方科目名",//""
                 "貸方補助",
-                "貸方補助科目名",
+                "貸方補助科目名",//""
                 "貸方金額",
                 "貸方消費税コード",
                 "貸方消費税業種",
                 "貸方消費税税率",
                 "貸方資金区分",
-                "貸方任意項目１",
-                "貸方任意項目２",
-                "摘要",
+                "貸方任意項目１",//""
+                "貸方任意項目２",//""
+                "摘要",//""
                 "期日",
-                "証番号",
-                "入力マシン",
-                "入力ユーザ",
-                "入力アプリ",
-                "入力会社",
+                "証番号",//""
+                "入力マシン",//""
+                "入力ユーザ",//""
+                "入力アプリ",//""
+                "入力会社",//""
                 "入力日付",
             ]; 
 
@@ -91,23 +91,28 @@ class OfficeExpensesService
         	$subAccountingItem = 0;
         	if($officeCode == "0011")//狭山
         	{
-        		$slipNo = 102;
+        		$slipNo1 = 111;
+                $officeName = "狭山店";
         	}
         	elseif($officeCode == "0017")//高松
         	{
-        		$slipNo = 103;
+        		$slipNo1 = 112;
+                $officeName = "高松店";
         	}
         	elseif($officeCode =="0023")//佐世保
         	{
-        		$slipNo = 104;
+        		$slipNo1 = 113;
+                $officeName = "佐世保店";
         	}
         	elseif($officeCode =="0027")//熊本
         	{
-        		$slipNo = 105;
+        		$slipNo1 = 114;
+                $officeName = "熊本店";
         	}
         	elseif($officeCode =="0050")//福岡
         	{
-        		$slipNo = 106;
+        		$slipNo1 = 115;
+                $officeName = "福岡店";
         	}
         	else
         	{
@@ -122,44 +127,98 @@ class OfficeExpensesService
                 0,
                 0,
                 $strEndDateYYYYMMDD,
-                $slipNo,
-                $endMonth."月度　直営仕入振替",
+                $slipNo1,
+                '',
                 1,
-                "",
-                "",
+                '',
+                '',
                 8221,
-                "",
-                "",
-                "",
+                '仕入高',
+                0,
+                '',
                 intval($purchasesValue - $expenses),
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                4511,
-                "",
-                "",
-                "",
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                999,
+                '諸口',
+                0,
+                '',
                 intval($purchasesValue),
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                $endMonth."月度　直営仕入振替\n".$officeName,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
             ];
+
+            mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $csv); //文字化け対策
+            $this->fputcsvNew($createCsvFile, $csv); //ファイルに追記する          
+
+
+            $csv = [
+                0,
+                0,
+                3,
+                0,
+                0,
+                $strEndDateYYYYMMDD,
+                $slipNo1,
+                '',
+                1,
+                '',
+                '',
+                999,
+                '諸口',
+                0,
+                '',
+                intval($purchasesValue - $expenses),
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                4511,
+                '本店',
+                0,
+                '',
+                intval($purchasesValue),
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                $endMonth."月度　直営仕入振替\n".$officeName,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+            ];
+
+            mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $csv); //文字化け対策
+            $this->fputcsvNew($createCsvFile, $csv); //ファイルに追記する          
+
 
 			$csv = [
                 0,
@@ -168,47 +227,47 @@ class OfficeExpensesService
                 0,
                 0,
                 $strEndDateYYYYMMDD,
-                $slipNo,
-                $endMonth."月度　直営仕入振替　\nエステ業務使用商品",
+                $slipNo1,
+                '',
                 2,
-                "",
-                "",
+                '',
+                '',
                 8490,
-                "",
-                "",
-                "",
+                'エステ経費',//13
+                0,
+                '',
                 intval($expenses),
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                999,
+                '諸口',//26
+                0,
+                '',
+                intval($expenses),
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                $endMonth."月度　直営仕入振替\n".$officeName." エステ業務使用商品",//36
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
             ];
 
             mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $csv); //文字化け対策
-            fputcsv($createCsvFile, $csv); //ファイルに追記する			
+            $this->fputcsvNew($createCsvFile, $csv); //ファイルに追記する			
 
             fclose($createCsvFile); //ファイル閉じる
         };
@@ -217,6 +276,33 @@ class OfficeExpensesService
         return response()->stream($callback, 200, $headers); //ここで実行
 
 	}
+
+
+    private function fputcsvNew($fp, $data) {
+
+        $csv = '';
+        $count = 0;
+        foreach ($data as $col) {
+            $count++;
+
+            if (is_numeric($col)) {
+                $csv .= $col;
+            } else {
+                if ($count == 13 or $count == 26 or $count == 36)
+                {
+                    $csv .= '"' . $col . '"';
+                }
+                else
+                {
+                    $csv .= $col;
+                }
+            }
+            $csv .= ',';
+        }
+
+        fwrite($fp, $csv);
+        fwrite($fp, "\r\n");
+    }
 
 
 	public function getExpensesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode)
@@ -390,5 +476,7 @@ class OfficeExpensesService
 		Log::debug("[END] OfficeExpensesService::calculateSalesPersonExpensesValueByProduct()");
     	return $dGenka_Sum1;
     }
+
+
 
 }

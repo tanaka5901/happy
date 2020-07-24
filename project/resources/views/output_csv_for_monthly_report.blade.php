@@ -24,29 +24,44 @@
                                 document.getElementById('department').style.display = "";
                                 document.getElementById('officeExpenses').style.display = "none";
                                 document.getElementById('departmentExpenses').style.display = "none";
+                                document.getElementById('officeSales').style.display = "none";
+                                document.getElementById('departmentSales').style.display = "none";
+                                document.getElementById('miscGoodsSales').style.display = "none";
                             } else if (type[1].checked) {
                                 // 売掛残高一覧表＆売上一覧表が選択されたら下記を実行
-                                document.getElementById('office').style.display = "";
-                                document.getElementById('department').style.display = "";
+                                document.getElementById('office').style.display = "none";
+                                document.getElementById('department').style.display = "none";
                                 document.getElementById('officeExpenses').style.display = "none";
                                 document.getElementById('departmentExpenses').style.display = "none";
+                                document.getElementById('officeSales').style.display = "";
+                                document.getElementById('departmentSales').style.display = "";
+                                document.getElementById('miscGoodsSales').style.display = "";
                             } else if (type[2].checked) {
                                 // 商品管理部売掛残高一覧表が選択されたら下記を実行
                                 document.getElementById('office').style.display = "none";
                                 document.getElementById('department').style.display = "none";
                                 document.getElementById('officeExpenses').style.display = "none";
                                 document.getElementById('departmentExpenses').style.display = "none";
+                                document.getElementById('officeSales').style.display = "none";
+                                document.getElementById('departmentSales').style.display = "none";
+                                document.getElementById('miscGoodsSales').style.display = "none";
                             } else if (type[3].checked) {
                                 // 販売担当者別売上実績表＆買掛台帳が選択されたら下記を実行
                                 document.getElementById('office').style.display = "none";
                                 document.getElementById('department').style.display = "none";
                                 document.getElementById('officeExpenses').style.display = "";
                                 document.getElementById('departmentExpenses').style.display = "";
+                                document.getElementById('officeSales').style.display = "none";
+                                document.getElementById('departmentSales').style.display = "none";
+                                document.getElementById('miscGoodsSales').style.display = "none";
                             } else {
                                 document.getElementById('office').style.display = "none";
                                 document.getElementById('department').style.display = "none";
                                 document.getElementById('officeExpenses').style.display = "none";
                                 document.getElementById('departmentExpenses').style.display = "none";
+                                document.getElementById('officeSales').style.display = "none";
+                                document.getElementById('departmentSales').style.display = "none";
+                                document.getElementById('miscGoodsSales').style.display = "none";
                             }
                         }
                         window.addEventListener('load', formSwitch());
@@ -125,6 +140,42 @@
                                         </select>
                                     </td>
                                 </tr>
+
+
+                                <tr id="officeSales" style="display: none;">
+                                    <td>事業所名</td>
+                                    <td>
+                                        <select name="officeSales">
+                                            <option value="0001">本社</option>
+                                            <option value="0011">狭山</option>
+                                            <option value="0017">高松</option>
+                                            <option value="0023">佐世保</option>
+                                            <option value="0027">熊本</option>
+                                            <option value="0050">福岡</option>
+                                        </select>                                        
+                                    </td>
+                                </tr>
+                                <tr id="departmentSales" style="display: none;">
+                                    <td>部署名</td>
+                                    <td>
+                                        <select name="departmentSales">
+                                            <option value="02">商品管理</option>
+                                            <option value="04">訪販</option>
+                                            <option value="05">エステ</option>
+                                            <option value="06">通販</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr id="miscGoodsSales" style="display: none;">
+                                    <td>その他（雑品）</td>
+                                    <td>
+                                        <select name="miscGoodsSales">
+                                            <option value="01">8％</option>
+                                            <option value="02">10％</option>
+                                        </select>
+                                    </td>
+                                </tr>
+
                             </table>
                         </div>
 
@@ -146,17 +197,35 @@
 
                             var officeExpenses = FD.get("officeExpenses");
                             var departmentExpenses = FD.get("departmentExpenses");
-                            if (officeExpenses == "0050"){
-                                if(departmentExpenses != "04"){
-                                    alert("部署名：訪販を入力してください");
-                                    return;                                    
-                                }
-                            } else {
+                            var officeSales = FD.get("officeSales");
+                            var departmentSales = FD.get("departmentSales");
+
+                            if (officeExpenses == "0011" || officeExpenses == "0017" || officeExpenses == "0023" || officeExpenses == "0027") {
                                 if(departmentExpenses != "05"){
                                     alert("部署名：エステを入力してください");
                                     return;                                    
                                 }
                             }
+
+                            if (officeSales == "0011" || officeSales == "0017" || officeSales == "0023" || officeSales == "0027") {
+                                if(departmentSales != "05"){
+                                    alert("部署名：エステを入力してください");
+                                    return;                                    
+                                }
+                            }
+
+
+                            //福岡
+                            if (officeExpenses == "0050" && departmentExpenses != "04"){
+                                alert("部署名：訪販を入力してください");
+                                return;                                    
+                            }
+
+                            if (officeSales == "0050" && departmentSales != "04"){
+                                alert("部署名：訪販を入力してください");
+                                return;                                    
+                            }
+
 
                             var url = '/export-csv/monthly-report/transfer-slip?';
 
@@ -183,9 +252,12 @@
                                 // onload 時の処理が動いたら成功かチェックさせる
                                 if (this.status == 200) {
                                     var fileName = FD.get('month') + '_' + FD.get('type') + '.csv';
-                                    
-                                    var bom  = new Uint8Array([0xEF, 0xBB, 0xBF]);
-                                    var blob = this.response;
+
+                                    //文字コード変換 UTF-8 > SJIS
+                                    var strResponse = Encoding.stringToCode(this.response);
+                                    var arrayResponse = Encoding.convert(strResponse, "SJIS", "UNICODE");
+                                    var blob = new Uint8Array(arrayResponse);
+
                                     // IEとその他で処理の切り分け
                                     if (navigator.appVersion.toString().indexOf('.NET') > 0) {
                                         // IE 10+

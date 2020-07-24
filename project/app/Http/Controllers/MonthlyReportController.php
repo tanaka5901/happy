@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use OfficeStockService;
+use OfficeSalesService;
 use OfficePurchasesService;
 use OfficeExpensesService;
 use Log;
@@ -45,7 +46,7 @@ class MonthlyReportController extends Controller
         }
         elseif ($type == "sales")
         {
-            return $this->exportStockCsv($request);
+            return $this->exportSalesCsv($request);
         }
         elseif ($type == "purchases")
         {
@@ -108,8 +109,7 @@ class MonthlyReportController extends Controller
 
 
         Log::debug("[END] MonthlyReportController::exportStockCsv()");
-		return OfficeStockService::exportCsv($previousStockValue, $currentStockValue, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD);
-        
+		return OfficeStockService::exportCsv($previousStockValue, $currentStockValue, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode);        
     }
 
 
@@ -118,9 +118,78 @@ class MonthlyReportController extends Controller
 
     private function exportSalesCsv(Request $request)
     {
+        Log::debug("[START] MonthlyReportController::exportSalesCsv()");
 
-        return 1; 
-        
+        $endDateYYYYMM = $request->input('month');//format "yyyy-mm"
+
+        Log::debug("month = " . $endDateYYYYMM);
+
+        $endDay = "20";
+        $endDateYYYYMMDD = $endDateYYYYMM ."-".$endDay;//format "yyyy-mm-dd"
+        $strEndDateYYYYMMDD = date('Ymd',strtotime($endDateYYYYMMDD)); //format "yyyymmdd"
+
+        $startDateYYYYMM = date('Y-m',strtotime('-1 month',strtotime($endDateYYYYMMDD)));//format "yyyy-mm"
+        $startDay = "21";
+        $startDateYYYYMMDD = $startDateYYYYMM ."-".$startDay;//format "yyyy-mm-dd"
+        $strStartDateYYYYMMDD = date('Ymd',strtotime($startDateYYYYMMDD)); //format "yyyymmdd"
+
+        $beforeDay = "20";
+        $beforeDateYYYYMMDD = $startDateYYYYMM ."-".$beforeDay;//format "yyyy-mm-dd"
+        $strBeforeDateYYYYMMDD = date('Ymd',strtotime($beforeDateYYYYMMDD)); //format "yyyymmdd"
+
+        $endDate = explode("-",$endDateYYYYMM);
+        $endMonth = $endDate[1];
+
+        $startDate = explode("-",$startDateYYYYMM);
+        $startMonth = $startDate[1];
+
+
+        Log::debug("strBeforeDateYYYYMMDD = " . $strBeforeDateYYYYMMDD);
+        Log::debug("strStartDateYYYYMMDD = " . $strStartDateYYYYMMDD);
+        Log::debug("strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
+        Log::debug("startMonth = " . $startMonth);
+        Log::debug("endMonth = " . $endMonth);
+
+
+        $officeCode = $request->input('officeSales');
+        Log::debug("office = " . $officeCode);
+
+        $departmentCode = $request->input('departmentSales');
+        Log::debug("department = " . $departmentCode);
+
+        $miscGoodsCode = $request->input('miscGoodsSales');
+        Log::debug("miscGoods = " . $miscGoodsCode);
+
+
+        if ($departmentCode == '02') //商品管理
+        {
+            $arrayResults = OfficeSalesService::getCommodityManagementSalesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode, $miscGoodsCode);
+
+            return OfficeSalesService::exportCommodityManagementCsv($arrayResults, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD);
+        }
+        elseif ($departmentCode == '04') //訪販
+        {
+            $arrayResults = OfficeSalesService::getDoorToDoorSellingSalesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode, $miscGoodsCode);
+
+            return OfficeSalesService::exportDoorToDoorSellingCsv($arrayResults, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode);
+        }
+        elseif ($departmentCode == '05') //エステ
+        {
+            $arrayResults = OfficeSalesService::getBueatySalonSalesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode, $miscGoodsCode);
+
+            return OfficeSalesService::exportBueatySalonCsv($arrayResults, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode);
+
+        }
+        elseif ($departmentCode == '06') //通販
+        {
+            $arrayResults = OfficeSalesService::getOnlineShoppingSalesValue($strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode, $departmentCode, $miscGoodsCode);            
+
+            return $arrayResults = OfficeSalesService::exportOnlineShoppingCsv($arrayResults, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD);
+        }
+
+
+        Log::debug("[END] MonthlyReportController::exportSalesCsv()");
+        return 1;         
     }
 
 
