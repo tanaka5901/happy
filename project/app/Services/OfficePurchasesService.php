@@ -37,7 +37,7 @@ class OfficePurchasesService
             
             $createCsvFile = fopen('php://output', 'w'); //ファイル作成
             
-             $columns = [ //1行目の情報
+            $columns = [ //1行目の情報
                 "月種別",
                 "種類",
                 "形式",
@@ -45,41 +45,41 @@ class OfficePurchasesService
                 "付箋",
                 "伝票日付",
                 "伝票番号",
-                "伝票摘要",
+                "伝票摘要",//""
                 "枝番",
                 "借方部門",
-                "借方部門名",
+                "借方部門名",//""
                 "借方科目",
-                "借方科目名",
+                "借方科目名",//""
                 "借方補助",
-                "借方補助科目名",
+                "借方補助科目名",//""
                 "借方金額",
                 "借方消費税コード",
                 "借方消費税業種",
                 "借方消費税税率",
                 "借方資金区分",
-                "借方任意項目１",
-                "借方任意項目２",
+                "借方任意項目１",//""
+                "借方任意項目２",//""
                 "貸方部門",
-                "貸方部門名",
+                "貸方部門名",//""
                 "貸方科目",
-                "貸方科目名",
+                "貸方科目名",//""
                 "貸方補助",
-                "貸方補助科目名",
+                "貸方補助科目名",//""
                 "貸方金額",
                 "貸方消費税コード",
                 "貸方消費税業種",
                 "貸方消費税税率",
                 "貸方資金区分",
-                "貸方任意項目１",
-                "貸方任意項目２",
-                "摘要",
+                "貸方任意項目１",//""
+                "貸方任意項目２",//""
+                "摘要",//""
                 "期日",
-                "証番号",
-                "入力マシン",
-                "入力ユーザ",
-                "入力アプリ",
-                "入力会社",
+                "証番号",//""
+                "入力マシン",//""
+                "入力ユーザ",//""
+                "入力アプリ",//""
+                "入力会社",//""
                 "入力日付",
             ]; 
 
@@ -87,33 +87,39 @@ class OfficePurchasesService
             fputcsv($createCsvFile, $columns); //1行目の情報を追記
 
             $count = 0;
+            $slipNo1 = 121;
 
             foreach ($arrayPurchasesValue as $key => $value) 
             {
 		    	Log::debug("arrayPurchasesValue[officeCode] = " . $key);
 		    	Log::debug("arrayPurchasesValue[purchasesValue] = " . $value);
 
-            	$subAccountingItem = 0;
+
             	if($key == "0011")//狭山
             	{
             		$subAccountingItem = 1130;
+            		$officeName ="狭山";
             	}
             	elseif($key == "0017")//高松
             	{
             		$subAccountingItem = 1250;
+            		$officeName ="高松";
             	}
             	elseif($key =="0023")//佐世保
             	{
             		$subAccountingItem = 1400;
+            		$officeName ="佐世保";
             	}
             	elseif($key =="0027")//熊本
             	{
             		$subAccountingItem = 1510;
+            		$officeName ="熊本";
             	}
-            	else
-            	{
-            		continue;
-            	}
+	        	else
+	        	{
+	        		//TODO:エラー処理
+	        		return;
+	        	}
 
 				$csv = [
 	                0,
@@ -122,47 +128,97 @@ class OfficePurchasesService
 	                0,
 	                0,
 	                $strEndDateYYYYMMDD,
-	                101,
-	                $endMonth."月度　直営仕入振替",
+	                $slipNo1,
+	                '',
 	                ++$count,
-	                "",
-	                "",
+	                '',
+	                '',
 	                1495,
-	                "",
+	                '支店',
 	                $subAccountingItem,
-	                "",
+	                $officeName,
 	                intval($value),
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                8221,
-	                "",
-	                "",
-	                "",
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                999,
+	                '諸口',
+	                0,
+	                '',
 	                intval($value),
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
-	                "",
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                $endMonth."月度　直営仕入振替",
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
 	            ];
 
 	            mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $csv); //文字化け対策
-	            fputcsv($createCsvFile, $csv); //ファイルに追記する			
+	            $this->fputcsvNew1($createCsvFile, $csv); //ファイルに追記する			
+
+				$csv = [
+	                0,
+	                0,
+	                3,
+	                0,
+	                0,
+	                $strEndDateYYYYMMDD,
+	                $slipNo1,
+	                '',
+	                $count,
+	                '',
+	                '',
+	                999,
+	                '諸口',
+	                0,
+	                '',
+	                intval($value),
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                8221,
+	                '仕入高',
+	                0,
+	                '',
+	                intval($value),
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                $endMonth."月度　直営仕入振替",
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	                '',
+	            ];
+
+	            mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $csv); //文字化け対策
+	            $this->fputcsvNew2($createCsvFile, $csv); //ファイルに追記する			
+
 			}
 
             fclose($createCsvFile); //ファイル閉じる
@@ -170,6 +226,59 @@ class OfficePurchasesService
         
     	Log::debug("[END] OfficePurchasesService::exportCsv()");
         return response()->stream($callback, 200, $headers); //ここで実行
+    }
+
+
+    private function fputcsvNew1($fp, $data) {
+
+        $csv = '';
+        $count = 0;
+        foreach ($data as $col) {
+            $count++;
+
+            if (is_numeric($col)) {
+                $csv .= $col;
+            } else {
+                if ($count == 13 or $count == 15 or $count == 26 or $count == 36)
+                {
+                    $csv .= '"' . $col . '"';
+                }
+                else
+                {
+                    $csv .= $col;
+                }
+            }
+            $csv .= ',';
+        }
+
+        fwrite($fp, $csv);
+        fwrite($fp, "\r\n");
+    }
+
+    private function fputcsvNew2($fp, $data) {
+
+        $csv = '';
+        $count = 0;
+        foreach ($data as $col) {
+            $count++;
+
+            if (is_numeric($col)) {
+                $csv .= $col;
+            } else {
+                if ($count == 13 or $count == 26 or $count == 36)
+                {
+                    $csv .= '"' . $col . '"';
+                }
+                else
+                {
+                    $csv .= $col;
+                }
+            }
+            $csv .= ',';
+        }
+
+        fwrite($fp, $csv);
+        fwrite($fp, "\r\n");
     }
 
 
@@ -564,7 +673,7 @@ class OfficePurchasesService
 			    '----------------------------------------------------------	
 			    */
 			    //CO_CODE_KAKUTEI = "02"
-			    $strSQL = "SELECT TB207.ZEINUKI "
+			    $strSQL = "SELECT TB207.ZEINUKI AS ZEINUKI "
 			    		."FROM TW_HB207 TB207, TW_HB225 TB225, TM_BS103 TB103 "
 			    		."WHERE TB225.PAGE_NO = '" . $resultPAGE_NO . "' "
 			    		."AND TB207.SIIREBI = '" . $resultSIIREBI . "' "
@@ -606,7 +715,7 @@ class OfficePurchasesService
 			    */
 
 			    //CO_CODE_KAKUTEI = "02"
-			    $strSQL = "SELECT TB207.ZEINUKI "
+			    $strSQL = "SELECT TB207.ZEINUKI AS ZEINUKI "
 			    		."FROM TW_HB207 TB207, TW_HB215 TB215, TM_BS103 TB103 "
 			    		."WHERE TB215.PAGE_NO = '" . $resultPAGE_NO . "' "
 			    		."AND TB207.SIIREBI = '" . $resultSIIREBI . "' "
@@ -644,7 +753,7 @@ class OfficePurchasesService
 			    '----------------------------------------------------------	
 			    */
 			    
-			    $strSQL = "SELECT TB207.ZEINUKI "
+			    $strSQL = "SELECT TB207.ZEINUKI AS ZEINUKI "
 			    		."FROM TW_HB207 TB207, TM_BS103 TB103 "
 			    		."WHERE TB207.PAGE_NO = '" . $resultPAGE_NO . "' "
 			    		."AND TB207.SIIREBI = '" . $resultSIIREBI . "' "

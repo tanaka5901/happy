@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\OfficeStockService;
+use App\Services\OfficeSalesService;
 use App\Services\OfficePurchasesService;
 use App\Services\OfficeExpensesService;
 
@@ -17,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind('OfficeStockService', OfficeStockService::class);
+        $this->app->bind('OfficeSalesService', OfficeSalesService::class);
         $this->app->bind('OfficePurchasesService', OfficePurchasesService::class);
         $this->app->bind('OfficeExpensesService', OfficeExpensesService::class);
     }
