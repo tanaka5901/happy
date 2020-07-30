@@ -17,15 +17,35 @@ class OfficeStockService
     	Log::debug("[INPUT] strStartDateYYYYMMDD = " . $strStartDateYYYYMMDD);
     	Log::debug("[INPUT] strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
 
+
+        if ($officeCode == "0001")//本社
+        {
+            $csvOfficeName = "HeadOffice";
+        }
+        elseif ($officeCode == "0011")//狭山
+        {
+            $csvOfficeName = "SayamaOffice";
+        }
+        elseif ($officeCode == "0017")//高松
+        {
+            $csvOfficeName = "TakamatsuOffice";
+        }
+        elseif ($officeCode == "0023")//佐世保
+        {
+            $csvOfficeName = "SaseboOffice";
+        }
+        elseif ($officeCode == "0027")//熊本
+        {
+            $csvOfficeName = "KumamotoOffice";
+        }
+
 		// CSVファイル名
-    	$currentDate = date("Ymd");
-        $file_name = $currentDate."-"."stock"
-        			."-".$strStartDateYYYYMMDD."-".$strEndDateYYYYMMDD.".csv";
+        $csvFileName = substr($strEndDateYYYYMMDD,0,4) . "-" . $endMonth . "-" . "Stock" . "-" . $csvOfficeName .".csv";
 
 
         $headers = [ //ヘッダー情報
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename='.$file_name,
+            'Content-Disposition' => 'attachment;filename='.$csvFileName,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -86,29 +106,26 @@ class OfficeStockService
             mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $columns); //文字化け対策    
             fputcsv($createCsvFile, $columns); //1行目の情報を追記
         	        	
+            $slipNo1 = 1;
+
         	if ($officeCode == "0001")//本社
         	{
-				$slipNo1 = 101;
 				$officeName = "本社";
         	}
         	elseif ($officeCode == "0011")//狭山
         	{
-				$slipNo1 = 102;
 				$officeName = "狭山店";
         	}
         	elseif ($officeCode == "0017")//高松
         	{
-				$slipNo1 = 103;
 				$officeName = "高松店";
         	}
         	elseif ($officeCode == "0023")//佐世保
         	{
-				$slipNo1 = 104;
 				$officeName = "佐世保店";
         	}
         	elseif ($officeCode == "0027")//熊本
         	{
-				$slipNo1 = 105;
 				$officeName = "熊本店";
         	}
         	else
@@ -130,7 +147,7 @@ class OfficeStockService
                 '',
                 '',
                 8240,
-                '△期末商品棚卸高',//TODO
+                '△期末商品棚卸高',
                 0,
                 '',
                 intval($previousStockValue),
@@ -153,7 +170,7 @@ class OfficeStockService
                 '',
                 '',
                 '',
-                $startMonth."月度　エステ（サロン）在庫計上\n$officeName",
+                $startMonth."月度　エステ（サロン）在庫計上　".$officeName,
                 '',
                 '',
                 '',
@@ -203,7 +220,7 @@ class OfficeStockService
                 '',
                 '',
                 '',
-                $startMonth."月度　エステ（サロン）在庫計上\n$officeName",
+                $startMonth."月度　エステ（サロン）在庫計上　".$officeName,
                 '',
                 '',
                 '',
@@ -253,7 +270,7 @@ class OfficeStockService
                 '',
                 '',
                 '',
-                $endMonth."月度　エステ（サロン）在庫計上\n$officeName",
+                $endMonth."月度　エステ（サロン）在庫計上　".$officeName,
                 '',
                 '',
                 '',
@@ -293,7 +310,7 @@ class OfficeStockService
                 '',
                 '',
                 8240,
-                '△期末商品棚卸高',//TODO
+                '△期末商品棚卸高',
                 0,
                 '',
                 intval($currentStockValue),
@@ -303,7 +320,7 @@ class OfficeStockService
                 '',
                 '',
                 '',
-                $endMonth."月度　エステ（サロン）在庫計上\n$officeName",
+                $endMonth."月度　エステ（サロン）在庫計上　".$officeName,
                 '',
                 '',
                 '',

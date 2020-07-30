@@ -17,14 +17,12 @@ class OfficePurchasesService
     	Log::debug("[INPUT] strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
 
 		// CSVファイル名
-    	$currentDate = date("Ymd");
-        $file_name = $currentDate."-"."purchases"
-        			."-".$strStartDateYYYYMMDD."-".$strEndDateYYYYMMDD.".csv";
+        $csvFileName = substr($strEndDateYYYYMMDD,0,4) . "-" . $endMonth . "-" . "Purchases-HeadOffice.csv";
 
 
         $headers = [ //ヘッダー情報
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename='.$file_name,
+            'Content-Disposition' => 'attachment; filename='.$csvFileName,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -87,7 +85,7 @@ class OfficePurchasesService
             fputcsv($createCsvFile, $columns); //1行目の情報を追記
 
             $count = 0;
-            $slipNo1 = 121;
+            $slipNo1 = 1;
 
             foreach ($arrayPurchasesValue as $key => $value) 
             {
@@ -200,7 +198,7 @@ class OfficePurchasesService
 	                0,
 	                '',
 	                intval($value),
-	                '',
+	                31,
 	                '',
 	                '',
 	                '',

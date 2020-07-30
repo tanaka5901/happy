@@ -18,15 +18,35 @@ class OfficeExpensesService
     	Log::debug("[INPUT] strStartDateYYYYMMDD = " . $strStartDateYYYYMMDD);
     	Log::debug("[INPUT] strEndDateYYYYMMDD = " . $strEndDateYYYYMMDD);
 
+
+        if ($officeCode == "0011")//狭山
+        {
+            $csvOfficeName = "SayamaOffice";
+        }
+        elseif ($officeCode == "0017")//高松
+        {
+            $csvOfficeName = "TakamatsuOffice";
+        }
+        elseif ($officeCode == "0023")//佐世保
+        {
+            $csvOfficeName = "SaseboOffice";
+        }
+        elseif ($officeCode == "0027")//熊本
+        {
+            $csvOfficeName = "KumamotoOffice";
+        }
+        elseif($officeCode =="0050")//福岡
+        {
+            $csvOfficeName = "FukuokaOffice";
+        }
+
 		// CSVファイル名
-    	$currentDate = date("Ymd");
-        $file_name = $currentDate."-"."expenses"
-        			."-".$strStartDateYYYYMMDD."-".$strEndDateYYYYMMDD.".csv";
+        $csvFileName = substr($strEndDateYYYYMMDD,0,4) . "-" . $endMonth . "-" . "Expenses" . "-" . $csvOfficeName .".csv";
 
 
         $headers = [ //ヘッダー情報
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename='.$file_name,
+            'Content-Disposition' => 'attachment; filename='.$csvFileName,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -88,30 +108,27 @@ class OfficeExpensesService
             mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $columns); //文字化け対策    
             fputcsv($createCsvFile, $columns); //1行目の情報を追記
 
+            $slipNo1 = 1;
         	$subAccountingItem = 0;
-        	if($officeCode == "0011")//狭山
+        	
+            if($officeCode == "0011")//狭山
         	{
-        		$slipNo1 = 111;
                 $officeName = "狭山店";
         	}
         	elseif($officeCode == "0017")//高松
         	{
-        		$slipNo1 = 112;
                 $officeName = "高松店";
         	}
         	elseif($officeCode =="0023")//佐世保
         	{
-        		$slipNo1 = 113;
                 $officeName = "佐世保店";
         	}
         	elseif($officeCode =="0027")//熊本
         	{
-        		$slipNo1 = 114;
                 $officeName = "熊本店";
         	}
         	elseif($officeCode =="0050")//福岡
         	{
-        		$slipNo1 = 115;
                 $officeName = "福岡店";
         	}
         	else
@@ -137,7 +154,7 @@ class OfficeExpensesService
                 0,
                 '',
                 intval($purchasesValue - $expenses),
-                '',
+                31,
                 '',
                 '',
                 '',
@@ -149,14 +166,14 @@ class OfficeExpensesService
                 '諸口',
                 0,
                 '',
-                intval($purchasesValue),
+                intval($purchasesValue - $expenses),
                 '',
                 '',
                 '',
                 '',
                 '',
                 '',
-                $endMonth."月度　直営仕入振替\n".$officeName,
+                $endMonth."月度　直営仕入振替　".$officeName,
                 '',
                 '',
                 '',
@@ -186,7 +203,7 @@ class OfficeExpensesService
                 '諸口',
                 0,
                 '',
-                intval($purchasesValue - $expenses),
+                intval($purchasesValue),
                 '',
                 '',
                 '',
@@ -206,7 +223,7 @@ class OfficeExpensesService
                 '',
                 '',
                 '',
-                $endMonth."月度　直営仕入振替\n".$officeName,
+                $endMonth."月度　直営仕入振替　".$officeName,
                 '',
                 '',
                 '',
@@ -233,11 +250,11 @@ class OfficeExpensesService
                 '',
                 '',
                 8490,
-                'エステ経費',//13
+                'エステ経費',
                 0,
                 '',
                 intval($expenses),
-                '',
+                31,
                 '',
                 '',
                 '',
@@ -246,7 +263,7 @@ class OfficeExpensesService
                 '',
                 '',
                 999,
-                '諸口',//26
+                '諸口',
                 0,
                 '',
                 intval($expenses),
@@ -256,7 +273,7 @@ class OfficeExpensesService
                 '',
                 '',
                 '',
-                $endMonth."月度　直営仕入振替\n".$officeName." エステ業務使用商品",//36
+                $endMonth."月度　直営仕入振替　".$officeName."　エステ業務使用商品",
                 '',
                 '',
                 '',
