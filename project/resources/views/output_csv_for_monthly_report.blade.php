@@ -252,6 +252,15 @@
                                 // onload 時の処理が動いたら成功かチェックさせる
                                 if (this.status == 200) {
                                     var fileName = FD.get('month') + '_' + FD.get('type') + '.csv';
+                                    
+
+                                    var contentDisposition = this.getResponseHeader('Content-Disposition');
+                                    var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/; // 正規表現でfilenameを抜き出す
+                                    var matches = filenameRegex.exec(contentDisposition);
+                                    if (matches != null && matches[1]) {
+                                        fileName = matches[1].replace(/['"]/g, '');
+                                    }
+
 
                                     //文字コード変換 UTF-8 > SJIS
                                     var strResponse = Encoding.stringToCode(this.response);

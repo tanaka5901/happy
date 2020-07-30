@@ -21,19 +21,15 @@ class OfficeSalesService
         Log::debug(print_r($arrayResults,true));
 
 		// CSVファイル名
-    	$currentDate = date("Ymd");
-        $file_name = $currentDate."-"."expenses"
-        			."-".$strStartDateYYYYMMDD."-".$strEndDateYYYYMMDD.".csv";
-
+        $csvFileName = substr($strEndDateYYYYMMDD,0,4) . "-" . $endMonth . "-Sales-CommodityManagement-HeadOffice.csv";
 
         $headers = [ //ヘッダー情報
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename='.$file_name,
+            'Content-Disposition' => 'attachment; filename='.$csvFileName,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
         ];
-
 
 
         $callback = function () use ($arrayResults, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD) 
@@ -90,7 +86,7 @@ class OfficeSalesService
             mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $columns); //文字化け対策    
             fputcsv($createCsvFile, $columns); //1行目の情報を追記
 
-            $slipNo1 = 131;
+            $slipNo1 = 1;
 
 			$csv = [
                 0,
@@ -128,7 +124,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　代理店売上計上\n社 販（軽税*8%） ",
+                $endMonth."月度　代理店売上計上　社販（軽税*8%）",
                 '',
                 '',
                 '',
@@ -171,13 +167,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['EmployeeSalesResult08']['product']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　代理店売上計上\n社 販（軽税*8%） ",
+                $endMonth."月度　代理店売上計上　社販（軽税*8%）",
                 '',
                 '',
                 '',
@@ -221,13 +217,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['EmployeeSalesResult10']['product']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　代理店売上計上\n社 販（税*10%） ",
+                $endMonth."月度　代理店売上計上　社販（税*10%）",
                 '',
                 '',
                 '',
@@ -266,17 +262,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['EmployeeSalesResult08']['miscGoods']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　代理店売上計上\n雑　費（軽税*8%） ",
+                $endMonth."月度　代理店売上計上　雑費（軽税*8%）",
                 '',
                 '',
                 '',
@@ -315,17 +311,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['EmployeeSalesResult10']['miscGoods']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　代理店売上計上\n雑　費（税*10%） ",
+                $endMonth."月度　代理店売上計上　雑費（税*10%）",
                 '',
                 '',
                 '',
@@ -375,7 +371,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　代理店売上計上\n消費税（軽税*8%） ",
+                $endMonth."月度　代理店売上計上　消費税（軽税*8%）",
                 '',
                 '',
                 '',
@@ -424,7 +420,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　代理店売上計上\n消費税（税*10%） ",
+                $endMonth."月度　代理店売上計上　消費税（税*10%）",
                 '',
                 '',
                 '',
@@ -747,15 +743,22 @@ class OfficeSalesService
         Log::debug("[INPUT] officeCode = " . $officeCode);
         Log::debug(print_r($arrayResults,true));
 
+        if ($officeCode == "0001")//本社
+        {
+            $csvOfficeName = 'HeadOffice';
+        }
+        elseif ($officeCode == "0050")//福岡
+        {
+            $csvOfficeName = 'FukuokaOffice';
+        }
+
         // CSVファイル名
-        $currentDate = date("Ymd");
-        $file_name = $currentDate."-"."expenses"
-                    ."-".$strStartDateYYYYMMDD."-".$strEndDateYYYYMMDD.".csv";
+        $csvFileName = substr($strEndDateYYYYMMDD,0,4) . "-" . $endMonth . "-Sales-DoorToDoorSelling-". $csvOfficeName .".csv";
 
 
         $headers = [ //ヘッダー情報
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename='.$file_name,
+            'Content-Disposition' => 'attachment; filename='.$csvFileName,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -817,22 +820,8 @@ class OfficeSalesService
             mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $columns); //文字化け対策    
             fputcsv($createCsvFile, $columns); //1行目の情報を追記
 
-            $slipNo = 0;
-            if ($officeCode == "0001")
-            {
-                $slipNo1 = 141;
-                $slipNo2 = 142;
-            }
-            elseif ($officeCode == "0050")
-            {
-                $slipNo1 = 143;
-                $slipNo2 = 144;
-            }
-            else
-            {
-                //TODO:エラー処理
-                return;
-            }
+            $slipNo1 = 1;
+            $slipNo2 = 2;
 
             $csv = [
                 0,
@@ -870,7 +859,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n訪販商品（軽税*8%） ",
+                $endMonth."月度　売上計上　訪販商品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -909,17 +898,17 @@ class OfficeSalesService
                 '',
                 '',
                 8111,
-                '売上高１販員',//TODO
+                '売上高１販員',
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult08']['product']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n訪販商品（軽税*8%） ",
+                $endMonth."月度　売上計上　訪販商品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -962,13 +951,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult08']['productArea']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n訪販エリア商品（軽税*8%） ",
+                $endMonth."月度　売上計上　訪販エリア商品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -1007,17 +996,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult08']['miscGoods']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n訪販雑品（軽税*8%） ",
+                $endMonth."月度　売上計上　訪販雑品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -1056,17 +1045,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult08']['miscGoodsArea']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n訪販エリア雑品（軽税*8%） ",
+                $endMonth."月度　売上計上　訪販エリア雑品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -1115,7 +1104,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n訪販消費税（軽税*8%） ",
+                $endMonth."月度　売上計上　訪販消費税（軽税*8%）",
                 '',
                 '',
                 '',
@@ -1146,7 +1135,7 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult08']['returnedProduct']),
-                '',
+                '01',
                 '',
                 '',
                 '',
@@ -1165,7 +1154,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n訪販商品　返品（軽税*8%） ",
+                $endMonth."月度　売上計上　訪販商品　返品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -1214,7 +1203,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n訪販消費税　返品（軽税*8%） ",
+                $endMonth."月度　売上計上　訪販消費税　返品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -1265,7 +1254,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n訪販商品（税*10%） ",
+                $endMonth."月度　売上計上　訪販商品（税*10%）",
                 '',
                 '',
                 '',
@@ -1304,17 +1293,17 @@ class OfficeSalesService
                 '',
                 '',
                 8111,
-                '売上高１販員',//TODO
+                '売上高１販員',
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult10']['product']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n訪販商品（税*10%） ",
+                $endMonth."月度　売上計上　訪販商品（税*10%）",
                 '',
                 '',
                 '',
@@ -1357,13 +1346,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult10']['productArea']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n訪販エリア商品（税*10%） ",
+                $endMonth."月度　売上計上　訪販エリア商品（税*10%）",
                 '',
                 '',
                 '',
@@ -1402,17 +1391,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult10']['miscGoods']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n訪販雑品（税*10%） ",
+                $endMonth."月度　売上計上　訪販雑品（税*10%）",
                 '',
                 '',
                 '',
@@ -1451,17 +1440,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult10']['miscGoodsArea']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n訪販エリア雑品（税*10%） ",
+                $endMonth."月度　売上計上　訪販エリア雑品（税*10%）",
                 '',
                 '',
                 '',
@@ -1510,7 +1499,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n訪販消費税（税*10%） ",
+                $endMonth."月度　売上計上　訪販消費税（税*10%）",
                 '',
                 '',
                 '',
@@ -1541,7 +1530,7 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['DoorToDoorSellingResult10']['returnedProduct']),
-                '',
+                '01',
                 '',
                 '',
                 '',
@@ -1560,7 +1549,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n訪販商品　返品（税*10%） ",
+                $endMonth."月度　売上計上　訪販商品　返品（税*10%）",
                 '',
                 '',
                 '',
@@ -1609,7 +1598,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n訪販消費税　返品（税*10%） ",
+                $endMonth."月度　売上計上　訪販消費税　返品（税*10%）",
                 '',
                 '',
                 '',
@@ -2038,14 +2027,11 @@ class OfficeSalesService
         Log::debug(print_r($arrayResults,true));
 
         // CSVファイル名
-        $currentDate = date("Ymd");
-        $file_name = $currentDate."-"."expenses"
-                    ."-".$strStartDateYYYYMMDD."-".$strEndDateYYYYMMDD.".csv";
-
+        $csvFileName = substr($strEndDateYYYYMMDD,0,4) . "-" . $endMonth . "-Sales-OnlineShopping-HeadOffice.csv";
 
         $headers = [ //ヘッダー情報
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename='.$file_name,
+            'Content-Disposition' => 'attachment; filename='.$csvFileName,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -2105,8 +2091,8 @@ class OfficeSalesService
             mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $columns); //文字化け対策    
             fputcsv($createCsvFile, $columns); //1行目の情報を追記
 
-            $slipNo1 = 151;
-            $slipNo2 = 152;
+            $slipNo1 = 1;
+            $slipNo2 = 2;
 
             $csv = [
                 0,
@@ -2144,7 +2130,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n通販商品（軽税*8%） ",
+                $endMonth."月度　売上計上　通販商品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -2188,13 +2174,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['OnlineShoppingResult08']['product']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n通販商品（軽税*8%） ",
+                $endMonth."月度　売上計上　通販商品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -2234,17 +2220,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['OnlineShoppingResult08']['miscGoods']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n通販雑品（軽税*8%） ",
+                $endMonth."月度　売上計上　通販雑品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -2293,8 +2279,8 @@ class OfficeSalesService
                 '',
                 '',
                 '',
+                $endMonth."月度　売上計上　通販消費税（軽税*8%）",
                 '',
-                $endMonth."月度　売上計上\n通販消費税（軽税*8%） ",
                 '',
                 '',
                 '',
@@ -2324,7 +2310,7 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['OnlineShoppingResult08']['returnedProduct']),
-                '',
+                '01',
                 '',
                 '',
                 '',
@@ -2343,7 +2329,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n通販商品　返品（軽税*8%） ",
+                $endMonth."月度　売上計上　通販商品　返品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -2392,7 +2378,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n通販消費税　返品（軽税*8%） ",
+                $endMonth."月度　売上計上　通販消費税　返品（軽税*8%） ",
                 '',
                 '',
                 '',
@@ -2442,7 +2428,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n通販商品（税*10%） ",
+                $endMonth."月度　売上計上　通販商品（税*10%）",
                 '',
                 '',
                 '',
@@ -2486,13 +2472,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['OnlineShoppingResult10']['product']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n通販商品（税*10%） ",
+                $endMonth."月度　売上計上　通販商品（税*10%）",
                 '',
                 '',
                 '',
@@ -2532,17 +2518,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['OnlineShoppingResult10']['miscGoods']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n通販雑品（税*10%） ",
+                $endMonth."月度　売上計上　通販雑品（税*10%）",
                 '',
                 '',
                 '',
@@ -2591,8 +2577,8 @@ class OfficeSalesService
                 '',
                 '',
                 '',
+                $endMonth."月度　売上計上　通販消費税（税*10%）",
                 '',
-                $endMonth."月度　売上計上\n通販消費税（税*10%） ",
                 '',
                 '',
                 '',
@@ -2622,7 +2608,7 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['OnlineShoppingResult10']['returnedProduct']),
-                '',
+                '01',
                 '',
                 '',
                 '',
@@ -2641,7 +2627,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n通販商品　返品（税*10%） ",
+                $endMonth."月度　売上計上　通販商品　返品（税*10%）",
                 '',
                 '',
                 '',
@@ -2690,7 +2676,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n通販消費税　返品（税*10%） ",
+                $endMonth."月度　売上計上　通販消費税　返品（税*10%）",
                 '',
                 '',
                 '',
@@ -3050,9 +3036,6 @@ class OfficeSalesService
 
 
 
-
-
-
     public function exportBueatySalonCsv($arrayResults, $startMonth, $endMonth, $strStartDateYYYYMMDD, $strEndDateYYYYMMDD, $officeCode)
     {
 
@@ -3064,15 +3047,36 @@ class OfficeSalesService
         Log::debug("[INPUT] officeCode = " . $officeCode);
         Log::debug(print_r($arrayResults,true));
 
+
+        if ($officeCode == "0001")//本社
+        {
+            $csvOfficeName = "HeadOffice";
+        }
+        elseif ($officeCode == "0011")//狭山
+        {
+            $csvOfficeName = "SayamaOffice";
+        }
+        elseif ($officeCode == "0017")//高松
+        {
+            $csvOfficeName = "TakamatsuOffice";
+        }
+        elseif ($officeCode == "0023")//佐世保
+        {
+            $csvOfficeName = "SaseboOffice";
+        }
+        elseif ($officeCode == "0027")//熊本
+        {
+            $csvOfficeName = "KumamotoOffice";
+        }
+
+
         // CSVファイル名
-        $currentDate = date("Ymd");
-        $file_name = $currentDate."-"."expenses"
-                    ."-".$strStartDateYYYYMMDD."-".$strEndDateYYYYMMDD.".csv";
+        $csvFileName = substr($strEndDateYYYYMMDD,0,4) . "-" . $endMonth . "-Sales-BueatySalon-".$csvOfficeName.".csv";
 
 
         $headers = [ //ヘッダー情報
             'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename='.$file_name,
+            'Content-Disposition' => 'attachment; filename='.$csvFileName,
             'Pragma' => 'no-cache',
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
@@ -3132,38 +3136,28 @@ class OfficeSalesService
             mb_convert_variables("UTF-8", "SJIS,ASCII,UTF-8,SJIS-win", $columns); //文字化け対策    
             fputcsv($createCsvFile, $columns); //1行目の情報を追記
 
+            $slipNo1 = 1;
+            $slipNo2 = 2;
+            $slipNo3 = 3;
+
             if ($officeCode == "0001")//本社
             {
-                $slipNo1 = 161;
-                $slipNo2 = 162;
                 $officeName = "本社";
             }
             elseif ($officeCode == "0011")//狭山
             {
-                $slipNo1 = 163;
-                $slipNo2 = 164;
-                $slipNo3 = 165;
                 $officeName = "狭山店";
             }
             elseif ($officeCode == "0017")//高松
             {
-                $slipNo1 = 166;
-                $slipNo2 = 167;
-                $slipNo3 = 168;
                 $officeName = "高松店";
             }
             elseif ($officeCode == "0023")//佐世保
             {
-                $slipNo1 = 169;
-                $slipNo2 = 170;
-                $slipNo3 = 171;
                 $officeName = "佐世保店";
             }
             elseif ($officeCode == "0027")//熊本
             {
-                $slipNo1 = 172;
-                $slipNo2 = 173;
-                $slipNo3 = 174;
                 $officeName = "熊本店";
             }
             else
@@ -3209,7 +3203,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n$officeName 商品（軽税*8%） ",
+                $endMonth."月度　売上計上 ".$officeName." 商品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -3253,13 +3247,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult08']['product']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n$officeName 商品（軽税*8%） ",
+                $endMonth."月度　売上計上 ".$officeName." 商品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -3303,13 +3297,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult08']['productArea']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n$officeName エリア商品（軽税*8%） ",
+                $endMonth."月度　売上計上 ".$officeName." エリア商品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -3348,17 +3342,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult08']['miscGoods']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n$officeName 雑品（軽税*8%） ",
+                $endMonth."月度　売上計上 ".$officeName." 雑品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -3397,17 +3391,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult08']['miscGoodsArea']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n$officeName エリア雑品（軽税*8%） ",
+                $endMonth."月度　売上計上 ".$officeName." エリア雑品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -3456,7 +3450,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n$officeName 消費税（軽税*8%） ",
+                $endMonth."月度　売上計上 ".$officeName." 消費税（軽税*8%）",
                 '',
                 '',
                 '',
@@ -3487,7 +3481,7 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult08']['returnedProduct']),
-                '',
+                '01',
                 '',
                 '',
                 '',
@@ -3506,7 +3500,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n$officeName 商品　返品（軽税*8%） ",
+                $endMonth."月度　売上計上 ".$officeName." 商品　返品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -3555,7 +3549,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n$officeName 消費税　返品（軽税*8%） ",
+                $endMonth."月度　売上計上 ".$officeName." 消費税　返品（軽税*8%）",
                 '',
                 '',
                 '',
@@ -3605,7 +3599,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n$officeName 商品（税*10%） ",
+                $endMonth."月度　売上計上 ".$officeName." 商品（税*10%）",
                 '',
                 '',
                 '',
@@ -3649,13 +3643,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult10']['product']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n$officeName 商品（税*10%） ",
+                $endMonth."月度　売上計上 ".$officeName." 商品（税*10%）",
                 '',
                 '',
                 '',
@@ -3699,13 +3693,13 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult10']['productArea']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n$officeName エリア商品（税*10%） ",
+                $endMonth."月度　売上計上 ".$officeName." エリア商品（税*10%）",
                 '',
                 '',
                 '',
@@ -3744,17 +3738,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult10']['miscGoods']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n$officeName 雑品（税*10%） ",
+                $endMonth."月度　売上計上 ".$officeName." 雑品（税*10%）",
                 '',
                 '',
                 '',
@@ -3793,17 +3787,17 @@ class OfficeSalesService
                 '',
                 '',
                 8113,
-                '売上高３雑品',//TODO
+                '売上高３雑品販売',
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult10']['miscGoodsArea']),
+                '01',
                 '',
                 '',
                 '',
                 '',
                 '',
-                '',
-                $endMonth."月度　売上計上\n$officeName エリア雑品（税*10%） ",
+                $endMonth."月度　売上計上 ".$officeName." エリア雑品（税*10%）",
                 '',
                 '',
                 '',
@@ -3852,7 +3846,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n$officeName 消費税（税*10%） ",
+                $endMonth."月度　売上計上 ".$officeName." 消費税（税*10%）",
                 '',
                 '',
                 '',
@@ -3883,7 +3877,7 @@ class OfficeSalesService
                 0,
                 '',
                 intval($arrayResults['BueatySalonResult10']['returnedProduct']),
-                '',
+                '01',
                 '',
                 '',
                 '',
@@ -3902,7 +3896,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n$officeName 商品　返品（税*10%） ",
+                $endMonth."月度　売上計上 ".$officeName." 商品　返品（税*10%）",
                 '',
                 '',
                 '',
@@ -3951,7 +3945,7 @@ class OfficeSalesService
                 '',
                 '',
                 '',
-                $endMonth."月度　売上計上\n$officeName 消費税　返品（税*10%） ",
+                $endMonth."月度　売上計上 ".$officeName." 消費税　返品（税*10%）",
                 '',
                 '',
                 '',
@@ -4004,7 +3998,7 @@ class OfficeSalesService
                     '',
                     '',
                     '',
-                    $endMonth."月度　売上計上\n$officeName 社販商品（軽税*8%） ",
+                    $endMonth."月度　売上計上 ".$officeName." 社販商品（軽税*8%）",
                     '',
                     '',
                     '',
@@ -4048,13 +4042,13 @@ class OfficeSalesService
                     0,
                     '',
                     intval($arrayResults['EmployeeSalesResult08']['product']),
+                    '01',
                     '',
                     '',
                     '',
                     '',
                     '',
-                    '',
-                    $endMonth."月度　売上計上\n$officeName 社販商品（軽税*8%） ",
+                    $endMonth."月度　売上計上 ".$officeName." 社販商品（軽税*8%）",
                     '',
                     '',
                     '',
@@ -4094,17 +4088,17 @@ class OfficeSalesService
                     '',
                     '',
                     8113,
-                    '売上高３雑品',//TODO
+                    '売上高３雑品販売',
                     0,
                     '',
                     intval($arrayResults['EmployeeSalesResult08']['miscGoods']),
+                    '01',
                     '',
                     '',
                     '',
                     '',
                     '',
-                    '',
-                    $endMonth."月度　売上計上\n$officeName 社販雑品（軽税*8%） ",
+                    $endMonth."月度　売上計上 ".$officeName." 社販雑品（軽税*8%）",
                     '',
                     '',
                     '',
@@ -4132,8 +4126,8 @@ class OfficeSalesService
                     999,
                     '諸口',
                     0,
-                    intval($arrayResults['EmployeeSalesResult08']['tax']),
                     '',
+                    intval($arrayResults['EmployeeSalesResult08']['tax']),
                     '',
                     '',
                     '',
@@ -4153,7 +4147,7 @@ class OfficeSalesService
                     '',
                     '',
                     '',
-                    $endMonth."月度　売上計上\n$officeName 消費税（軽税*8%） ",
+                    $endMonth."月度　売上計上".$officeName." 消費税（軽税*8%）",
                     '',
                     '',
                     '',
@@ -4197,13 +4191,13 @@ class OfficeSalesService
                     0,
                     '',
                     intval($arrayResults['EmployeeSalesResult10']['product']),
+                    '01',
                     '',
                     '',
                     '',
                     '',
                     '',
-                    '',
-                    $endMonth."月度　売上計上\n$officeName 社販商品（税*10%） ",
+                    $endMonth."月度　売上計上 ".$officeName." 社販商品（税*10%）",
                     '',
                     '',
                     '',
@@ -4243,17 +4237,17 @@ class OfficeSalesService
                     '',
                     '',
                     8113,
-                    '売上高３雑品',//TODO
+                    '売上高３雑品販売',
                     0,
                     '',
                     intval($arrayResults['EmployeeSalesResult10']['miscGoods']),
+                    '01',
                     '',
                     '',
                     '',
                     '',
                     '',
-                    '',
-                    $endMonth."月度　売上計上\n$officeName 社販雑品（税*10%） ",
+                    $endMonth."月度　売上計上 ".$officeName." 社販雑品（税*10%）",
                     '',
                     '',
                     '',
@@ -4302,7 +4296,7 @@ class OfficeSalesService
                     '',
                     '',
                     '',
-                    $endMonth."月度　売上計上\n$officeName 消費税（税*10%） ",
+                    $endMonth."月度　売上計上 ".$officeName." 消費税（税*10%）",
                     '',
                     '',
                     '',
