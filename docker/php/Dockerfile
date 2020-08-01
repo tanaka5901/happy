@@ -41,7 +41,7 @@ RUN apt-get update && apt-get -y install vim
 # Microsft SQL driver install
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 #RUN curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-tools.list
-RUN curl https://packages.microsoft.com/config/debian/8/prod.list > /etc/apt/sources.list.d/mssql-release.list
+RUN curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update
 RUN echo 'y' | ACCEPT_EULA=Y apt-get install msodbcsql17 mssql-tools
 RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
@@ -51,4 +51,4 @@ RUN pecl install  sqlsrv \
     && pecl install pdo_sqlsrv \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv
 
-
+# RUN chown www-data:www-data /var/www/
